@@ -213,36 +213,36 @@ INSERT INTO orders VALUES (2316, 30, 100, 'Football', 25, 230, 'Shoes', 'RMD', '
 INSERT INTO orders VALUES (4400, 2, 300, 'Training poles', Null, Null, Null, 'RMD', 'CA130');
 
 
+
+
+
+
+
+
+
+
+
 -- -----------------------------------------------
 -- stored procedures and views
 -- -----------------------------------------------
-
-
-
-
-
-
 add_player
 delimiter // 
 create procedure add_player (in ip_ID char(9),
 	in ip_first_name char(100), in ip_last_name char(100),
 	in ip_country char(255), in ip_ent_year year,
 	in ip_salary decimal(3, 0), in ip_club char(255), in ip_jersey_number decimal(2, 0),
-    in ip_position char(255), in ip_birthday char(255), in ip_represent_Nation varchar(255),
-    in ip_lead_club boolean, in ip_lead_country boolean)
+    	in ip_position char(255), in ip_birthday char(255), in ip_represent_Nation varchar(255),
+    	in ip_lead_club boolean, in ip_lead_country boolean)
 sp_main: begin
-	if (ip_ID in (select ID from worker) or 
-        ip_jersey_number in 
+	if (ip_ID in (select ID from worker) or ip_jersey_number in 
 			(select jersey_number from 
 				worker left join player on worker.ID = player.ID
-			where club =  ip_club))
-	then leave sp_main; 
-    end if;
-    
+			where club =  ip_club)) then leave sp_main; 
+  	end if;    
 	insert into worker values (ip_ID, ip_first_name, ip_last_name, ip_country, ip_ent_year,
-    ip_salary, ip_club, FALSE, TRUE);
-    insert into player values (ip_ID, ip_jersey_number, ip_position, ip_birthday, 0 , 0,
-    ip_represent_Nation, ip_lead_club, ip_lead_country);
+    	ip_salary, ip_club, FALSE, TRUE);
+   	insert into player values (ip_ID, ip_jersey_number, ip_position, ip_birthday, 0 , 0,
+    	ip_represent_Nation, ip_lead_club, ip_lead_country);
 end //
 delimiter ;
 
@@ -269,20 +269,33 @@ sp_main: begin
     then leave sp_main;
     end if;
     
-    insert into team values (ip_ID, ip_name, ip_country, ip_captain);
-    
+    insert into team values (ip_ID, ip_name, ip_country, ip_captain);    
 	if ip_world_rank is null
 	then insert into club_team values (ip_ID, ip_country_rank); 
-    end if;
-    
+    end if;   
 	if ip_country_rank is null
 	then insert into national_team values (ip_ID, ip_world_rank);
     end if;
 end //
 delimiter ;
 
--- call add_team("POP", "GT Idiots 1", "USA", "John Doe", NULL, 1);
--- call add_team("BOB", "GT Idiots 2", "USA", "John Doe", 1, NULL);
+call add_team("POP", "GT Idiots 1", "USA", "John Doe", NULL, 1);
+call add_team("BOB", "GT Idiots 2", "USA", "John Doe", 1, NULL);
+
+-- display players who play for the national teams with world rank of top 10 in the platform
+create or replace view national_players (player_ID, fname, lname) as
+select player.ID, worker.f_name, worker.l_name from player 
+left join worker on player.ID = worker.ID 
+left join team on team.country = player.represent_Nation
+left join national_team on national_team.ID = team.ID
+where world_rank <= 10;
+
+-- display players who scored more than 10 goals in all games of the season in the platform
+create or replace view best_players (player_ID, fname, lname) as
+select player.ID, worker.f_name, worker.l_name from player 
+left join worker on player.ID = worker.ID
+where num_goals > 10;
+
 
 club captain
 delimiter // 
@@ -304,7 +317,7 @@ sp_main: begin
 end //
 delimiter ;
 
--- call change_club_captain("RMD", "John Doe", "POOP");
+call change_club_captain("RMD", "John Doe", "POOP");
 
 participate competitions
 delimiter // 
