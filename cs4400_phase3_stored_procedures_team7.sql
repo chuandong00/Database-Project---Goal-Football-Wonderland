@@ -246,7 +246,19 @@ sp_main: begin
 end //
 delimiter ;
 
-call add_player("POP", "Testing", "Here", "Memeland", 2022, 10, "RMD", 99, "Forward", '07/26/2022', "Spain", False, False);
+-- display players who play for the national teams with world rank of top 10 in the platform
+create or replace view national_players (player_ID, fname, lname) as
+select player.ID, worker.f_name, worker.l_name from player 
+left join worker on player.ID = worker.ID 
+left join team on team.country = player.represent_Nation
+left join national_team on national_team.ID = team.ID
+where world_rank <= 10;
+
+-- display players who scored more than 10 goals in all games of the season in the platform
+create or replace view best_players (player_ID, fname, lname) as
+select player.ID, worker.f_name, worker.l_name from player 
+left join worker on player.ID = worker.ID
+where num_goals > 10;
 
 remove_player
 delimiter // 
@@ -255,8 +267,6 @@ sp_main: begin
 	delete from worker where ID = ip_ID;
 end //
 delimiter ;
-
-call remove_player("POP");
 
 add_team
 delimiter // 
@@ -282,19 +292,7 @@ delimiter ;
 call add_team("POP", "GT Idiots 1", "USA", "John Doe", NULL, 1);
 call add_team("BOB", "GT Idiots 2", "USA", "John Doe", 1, NULL);
 
--- display players who play for the national teams with world rank of top 10 in the platform
-create or replace view national_players (player_ID, fname, lname) as
-select player.ID, worker.f_name, worker.l_name from player 
-left join worker on player.ID = worker.ID 
-left join team on team.country = player.represent_Nation
-left join national_team on national_team.ID = team.ID
-where world_rank <= 10;
 
--- display players who scored more than 10 goals in all games of the season in the platform
-create or replace view best_players (player_ID, fname, lname) as
-select player.ID, worker.f_name, worker.l_name from player 
-left join worker on player.ID = worker.ID
-where num_goals > 10;
 
 
 club captain
