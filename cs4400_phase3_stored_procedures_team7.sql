@@ -217,6 +217,11 @@ INSERT INTO orders VALUES (4400, 2, 300, 'Training poles', Null, Null, Null, 'RM
 -- stored procedures and views
 -- -----------------------------------------------
 
+
+
+
+
+
 add_player
 delimiter // 
 create procedure add_player (in ip_ID char(9),
